@@ -24,12 +24,11 @@ def main():
             Play Store Review Analyzer
         </h1>
         <p style='text-align: center; color: #666666;'>
-            Analyze user reviews and discover insights for your app!
         </p>
         """, unsafe_allow_html=True)
 
     # Connect to SQLite database
-    conn = sqlite3.connect("C:/Users/hadic/Desktop/playstore_reviews_first.db")
+    conn = sqlite3.connect("C:/Users/hadic/PycharmProjects/ReviewAnalyzer/playstore_reviews_first.db")
 
     app_names = get_apps_names(conn)
     app_ids = get_apps_ids(conn)
@@ -109,7 +108,7 @@ def main():
         number_of_opinion = st.radio(
             label="Select number of opinions",
             options=[1, 2, 3, 4, 5],
-            help="Navigate to the Most Related Opinions tab to see results."
+            help="Navigate to the Top Opinions tab to see mentions."
         )
 
     one_star_reviews = get_number_of_one_star_reviews(app_id, conn)
@@ -124,7 +123,7 @@ def main():
     neutral_sentences = get_number_of_neutral_sentences(app_id, conn)
     sentences = [positive_sentences, negative_sentences, neutral_sentences]
 
-    tab1, tab2, tab3 = st.tabs(["📄 Overview", "📊 Aspect Sentiment Analysis", "💭 Most Related Opinions"])
+    tab1, tab2, tab3 = st.tabs(["📄 Overview", "📊 Aspect Based Sentiment Analysis", "💭 Top Opinions"])
 
     with tab1:
         col1, col2, col3, col4 = st.columns(4)
@@ -271,7 +270,7 @@ def main():
         # Update layout to make it a stacked bar chart
         aspect_figure.update_layout(
             barmode='stack',
-            title='Aspects vs Opinions by Sentiments',
+            title='Aspects vs Number of Opinions by Sentiments',
             xaxis_title='Number of Opinions',
             yaxis_title='Aspects',
             template='plotly',
@@ -396,7 +395,7 @@ def main():
 
         # Update layout to make it a stacked bar chart
         summary_table.update_layout(
-            title='Most Frequent Opinions',
+            title = "Aspects and Top Opinions",
             height=1000
         )
 
@@ -415,7 +414,7 @@ def main():
         # Add title page
         pdf.add_page()
         pdf.set_font("Arial", "BU", size=16)
-        pdf.cell(190, 10, txt="Analysis Report", ln=True, align='C')
+        pdf.cell(190, 10, txt="Analysis Summary Report", ln=True, align='C')
         pdf.ln(30)
 
         # Add metadata
@@ -426,7 +425,7 @@ def main():
             ("Average Rating", f"{avg_rating:.2f}"),
             ("Number of Reviews", sum(review_numbers)),
             ("Number of Opinions", sum(sentences)),
-            ("Opinion Summary Count", number_of_opinion),
+            ("Top Opinion Count", number_of_opinion),
             ("Analyzed Aspects", ', '.join(selected_options))
         ]
 
@@ -445,14 +444,14 @@ def main():
         # Add aspect sentiments chart on new page
         pdf.add_page()
         pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 10, "Sentiment Analysis", ln=True, align='C')
+        pdf.cell(0, 10, "Aspect Based Sentiments", ln=True, align='C')
         pdf.ln(5)
         pdf.image('aspect_figure.png', x=20, y=None, w=170)
 
         # Add opinion table on next page
         pdf.add_page()
         pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 10, "Opinion Summary Analysis", ln=True, align='C')
+        pdf.cell(0, 10, "Top Opinions", ln=True, align='C')
         pdf.ln(5)
 
         # Create the table
